@@ -2,6 +2,7 @@
 
 from math import cos,pi
 from matplotlib import pyplot as pl
+import numpy
 
 from os import sys
 # Cantidad de ondas superpuestas
@@ -11,21 +12,20 @@ else:
 	n = 6
 
 # Frecuencia inicial
-f0 = 50
+f0 = 1
 # Espaciado de frecuencias
-df = 5
-# Ciclos de la portadora a calcular
-ciclos = 50
-# Puntos por segundo
-puntos = 1000
+df = 0.05
+# Ciclos del pulso a graficar
+ciclos = 5
+# Puntos a graficar
+puntos = 10000
 
-y = [0 for i in xrange(ciclos*puntos/f0)]
+y = numpy.zeros((puntos))
+x = numpy.linspace(0,ciclos/df,puntos)
 
 for i in range(n):
-	f = (f0+i*df)
-	w = 2*pi*f/puntos
-	for x in range(len(y)):
-		y[x] += cos(w*x)
+	w = 2*pi*(f0+i*df)
+	y += numpy.cos(w*x)
 
 pl.plot(y)
 pl.show()
