@@ -2,6 +2,7 @@
 #--coding: utf-8 --
 
 import math
+import numpy
 
 class ModosNormales():
 	""" Simula los modos normales de una cuerda/resorte/etc """
@@ -14,7 +15,7 @@ class ModosNormales():
 		self.derFijo = derFijo
 		self.modos = modos or []
 		self.resolucion = resolucion
-		self.posicion = [0 for i in xrange(resolucion)]
+		self.posicion = numpy.zeros((resolucion))
 		# Cada modo tiene un componente espacial cuya fase inicial la determina
 		# la condición de borde izquierdo.
 		# Si los dos bordes son iguales, la forma del primer modo cubre pi
@@ -30,20 +31,16 @@ class ModosNormales():
 		#print "Calculando para",T
 		# Inicio la posición de la cuerda.
 		# Voy a ir sumándole cada modo
-		self.posicion = [0.0 for i in xrange(self.resolucion)]
+		self.posicion = numpy.zeros((self.resolucion))
 		for (n,amplitudes) in enumerate(self.modos):
-			#print "Modo",n,"amplitud",amplitudes
-			fase = [0,math.pi/2][self.izqFijo]
-			fase_final = fase + self.k + n*math.pi
-			fase_paso = (fase_final-fase)/self.resolucion
+			# Calculo la forma del modo
+			fase_inicial = [0,math.pi/2][self.izqFijo]
+			fase_final = fase_inicial + self.k + n*math.pi
+			# A es la amplitud correspondiente a este modo e instante
 			a = amplitudes[0]*math.cos(2.0*math.pi*T*2**n) + \
 				amplitudes[1]*math.sin(2.0*math.pi*T*2**n)
-			#print "a=",a
-			# Calculo la forma del modo
-			for x in xrange(self.resolucion):
-				#print fase / (2*math.pi) * 100,"%",math.cos
-				self.posicion[x] += a*math.cos(fase)
-				fase += fase_paso
+			fases = numpy.linspace(fase_inicial,fase_final,self.resolucion)
+			self.posicion += a*numpy.cos(fases)
 
 	def mostrar(self):
 		""" Escribe la forma de la cuerda a la consola """
