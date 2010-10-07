@@ -9,6 +9,7 @@ class VerOnda(QGLWidget):
 		QGLWidget.__init__(self,parent)
 		self.setWindowTitle("Ver Onda")
 		self.resize(800,600)
+		self.posicion = None
 
 	def mostrar(self,posicion):
 		self.posicion = posicion
@@ -19,10 +20,14 @@ class VerOnda(QGLWidget):
 	
 	def resizeGL(self,w,h):
 		glViewport(0,0,w,h)
+		glMatrixMode(GL_PROJECTION)
+		glLoadIdentity()
 		glOrtho(0.0,1.0,-1.0,1.0,-1.0,1.0)
 
 	def paintGL(self):
 		glClear(GL_COLOR_BUFFER_BIT)
+		if self.posicion is None:
+			return
 		glBegin(GL_LINE_STRIP)
 		glColor(1,0,0)
 		for (n,y) in enumerate(self.posicion):
