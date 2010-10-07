@@ -8,6 +8,7 @@
 
 from math import sin,e,pi
 from matplotlib import pyplot as pl
+import numpy
 
 from os import sys
 # Cantidad de ondas superpuestas
@@ -18,18 +19,11 @@ else:
 
 # Ciclos de la moduladora a graficar
 ciclos = 2
-# Puntos a graficar por ciclo
+# Puntos a graficar
 puntos = 200
 
-# Período = 2pi/dw
-# Cada punto = 2pi/dw/puntos
-
-y = []
-for x in xrange(1,ciclos*puntos):
-	try:
-		y.append(sin(x*n*2*pi/puntos)/sin(x*2*pi/puntos))
-	except ZeroDivisionError:
-		y.append(y[-1])
+x = numpy.linspace(0,2*pi*ciclos,puntos)
+y = numpy.sin(x*n)/numpy.sin(x)
 
 pl.plot(y)
 pl.show()
