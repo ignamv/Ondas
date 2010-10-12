@@ -85,8 +85,10 @@ class Dibuja(QGLWidget):
 		y = 1-2.0*y/self.height()
 		if x<0 or x>=self.resolucion or y<-1 or y>=1:
 			return
-		self.puntos[self.ultimo[0]+1:x+1] = np.linspace(
-				self.ultimo[1],y,x-self.ultimo[0])
+		xmin = min(self.ultimo[0]+1,x+1)
+		xmax = max(self.ultimo[0]+1,x+1)
+		self.puntos[xmin:xmax] = np.linspace(
+				self.ultimo[1],y,xmax-xmin)
 		self.ultimo = (x,y)
 		self.updateGL()
 
