@@ -27,13 +27,16 @@ class VentanaFFT(QWidget):
 		#self.canvas.setParent(izquierdo)
 		self.setLayout(QGridLayout())
 		#self.setLayout(izquierdo)
-		self.layout().addWidget(self.dib,1,1)
-		self.layout().addWidget(self.canvas,2,1)
-		self.layout().addLayout(self.crearBotones(),1,2,2,1)
+		self.layout().addWidget(QLabel("Dibuje la onda arrastrando el "
+			"mouse"),1,1)
+		self.layout().addWidget(self.dib,2,1)
+		self.layout().addWidget(self.canvas,3,1)
+		self.layout().addLayout(self.crearBotones(),1,2,3,1)
 
 	def crearBotones(self):
 		cont1 = QGroupBox(u"Definir señal")
 		cont1.setLayout(QHBoxLayout())
+
 		self.slider_constante = QSlider(Qt.Horizontal)
 		self.slider_constante.setMinimum(-10)
 		self.slider_constante.setMaximum(10)
@@ -46,27 +49,32 @@ class VentanaFFT(QWidget):
 		cero.clicked.connect(self.constante)
 		cont1.layout().addWidget(cero)
 
-		modular = QPushButton("Modular")
-		modular.clicked.connect(self.modular)
+		ruido = QPushButton("Ruido")
+		ruido.clicked.connect(self.ruido)
+		cont1.layout().addWidget(ruido)
 
 		ret = QVBoxLayout()
 		ret.addWidget(cont1)
-		ret.addWidget(modular)
+
+		for widget in self.cargar_plugins():
+			ret.addWidget(widget)
+
 		return ret
+
+	def cargar_plugins(self):
+		widgets = []
+		from plugin_modular import Plugin_Modular
+		widgets.append(Plugin_Modular(self.dib))
+		return widgets
 
 	def constante(self):
 		""" Vuelvo la señal a cero """
 		self.dib.cargar(np.repeat(0.1*self.slider_constante.value(),
 			self.dib.resolucion))
 
-	def modular(self):
-		""" Multiplico por una portadora """
-		# Fportadora / F0
-		f = 40
-		w = f*2*np.pi/self.dib.resolucion
-		x = np.arange(self.dib.resolucion)
-		nueva = np.sin(w*x)*self.dib.puntos
-		self.dib.cargar(nueva)
+	def ruido(self):
+		""" Creo una señal al azar """
+		self.dib.cargar(np.random.random((self.dib.resolucion))*2-1)
 
 	def espectro(self):
 		# Grafico la transformada
