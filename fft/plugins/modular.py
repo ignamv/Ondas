@@ -2,12 +2,11 @@
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import Qt, pyqtSignal
-from plugin_fft import FFTPlugin
 import numpy as np
 
-class Plugin_Modular(FFTPlugin,QGroupBox):
-	def __init__(self, dib):
-		QGroupBox.__init__(self,"Modular")
+class Plugin(QGroupBox):
+	def __init__(self, dib,parent=None):
+		QGroupBox.__init__(self,"Modular",parent)
 		self.dib = dib
 
 		self.setLayout(QHBoxLayout())

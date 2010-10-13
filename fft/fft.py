@@ -27,34 +27,14 @@ class VentanaFFT(QWidget):
 		#self.canvas.setParent(izquierdo)
 		self.setLayout(QGridLayout())
 		#self.setLayout(izquierdo)
-		self.layout().addWidget(QLabel("Dibuje la onda arrastrando el "
-			"mouse"),1,1)
+		self.layout().addWidget(QLabel(
+			"Dibuje la onda arrastrando el mouse"),1,1)
 		self.layout().addWidget(self.dib,2,1)
 		self.layout().addWidget(self.canvas,3,1)
 		self.layout().addLayout(self.crearBotones(),1,2,3,1)
 
 	def crearBotones(self):
-		cont1 = QGroupBox(u"Definir señal")
-		cont1.setLayout(QHBoxLayout())
-
-		self.slider_constante = QSlider(Qt.Horizontal)
-		self.slider_constante.setMinimum(-10)
-		self.slider_constante.setMaximum(10)
-		cont1.layout().addWidget(self.slider_constante)
-		self.label_constante = QLabel("0")
-		self.slider_constante.valueChanged.connect(self.label_constante.setNum)
-		cont1.layout().addWidget(self.label_constante)
-
-		cero = QPushButton("Constante")
-		cero.clicked.connect(self.constante)
-		cont1.layout().addWidget(cero)
-
-		ruido = QPushButton("Ruido")
-		ruido.clicked.connect(self.ruido)
-		cont1.layout().addWidget(ruido)
-
 		ret = QVBoxLayout()
-		ret.addWidget(cont1)
 
 		for widget in self.cargar_plugins():
 			ret.addWidget(widget)
@@ -62,19 +42,25 @@ class VentanaFFT(QWidget):
 		return ret
 
 	def cargar_plugins(self):
+		import os,imp
 		widgets = []
-		from plugin_modular import Plugin_Modular
-		widgets.append(Plugin_Modular(self.dib))
+		# Dónde busco plugins
+		dirs = [os.getcwd()+'/plugins']
+		for nombre in open("plugins.cfg"):
+			nombre = nombre.strip()
+			if len(nombre) == 0 or nombre[0] == '#':
+				continue
+			try:
+				fp,path,descripcion = imp.find_module(nombre,dirs)
+				modulo = imp.load_module(nombre, fp, path, descripcion)
+				widgets.append(modulo.Plugin(self.dib))
+			except ImportError:
+				print "Error cargando plugin",nombre
+				continue
+			finally:
+				if fp:
+					fp.close()
 		return widgets
-
-	def constante(self):
-		""" Vuelvo la señal a cero """
-		self.dib.cargar(np.repeat(0.1*self.slider_constante.value(),
-			self.dib.resolucion))
-
-	def ruido(self):
-		""" Creo una señal al azar """
-		self.dib.cargar(np.random.random((self.dib.resolucion))*2-1)
 
 	def espectro(self):
 		# Grafico la transformada
